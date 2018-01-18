@@ -1,8 +1,6 @@
 # ServiceButler
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/service_butler`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A simple gem to interface directly with microservice functions trough a unified API.
 
 ## Installation
 
@@ -22,7 +20,30 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+These services are a miniature function of Activerecord. 
+The following methods are available:
+- `.find([ID])` (When `action` is defined) (also with `!`)
+- `.find_by([KEY => VALUE])` (When `action` is defined) (also with `!`)
+- `.where([KEY => VALUE])` (When `batch_action` is defined) 
+- `.all` (When `batch_action` is defined) 
+
+It will autodetect the available fields and create methods accordingly;
+```ruby
+item = ExampleService.find(1) # => ExampleService
+item.name # => "John Doe"
+```
+
+### GraphQL Service
+To define a graphql service you can use the following example;
+```ruby
+class ExampleService < ServiceButler::GraphQLService
+  host 'http://localhost:3002/graphql' # Endpoint location
+  action 'event' # Single record fetch
+  batch_action 'events' # Batch record fetch endpoint
+end
+```
+
+Both `action` and `batch_action` are optional. But at lease one of them is required
 
 ## Development
 
@@ -32,7 +53,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/service_butler.
+Bug reports and pull requests are welcome on GitHub at https://github.com/cgservices/service_butler.
 
 ## License
 
