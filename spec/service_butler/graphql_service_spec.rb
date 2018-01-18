@@ -1,5 +1,3 @@
-require "byebug"
-
 RSpec.describe ServiceButler::GraphQLService do
   VersionType = GraphQL::ObjectType.define do
     name "Version"
