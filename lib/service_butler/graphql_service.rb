@@ -1,6 +1,3 @@
-require "graphql/client"
-require "graphql/client/http"
-
 module ServiceButler
   class GraphQLService < BaseService
     def initialize(attributes)
@@ -79,7 +76,7 @@ module ServiceButler
       end
 
       def adapter
-        @adapter ||= GraphQL::Client::HTTP.new(@host)
+        @adapter ||= Utilities::GraphQLAdapter.new(@host)
       end
 
       # Retreive the schema. Cache it so it won't be called all the time
@@ -145,8 +142,10 @@ module ServiceButler
 
       private
       def fetch(graphql_string)
+        context = {}
+        context['headers'] = {'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY']} if ENV['CG_MASTER_KEY']
         document = GraphQL.parse(graphql_string)
-        adapter.execute(document: document)
+        adapter.execute(document: document, context: context)
       end
 
       def parse_params(arguments)

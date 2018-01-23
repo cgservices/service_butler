@@ -44,7 +44,7 @@ RSpec.describe ServiceButler::GraphQLService do
       batch_action 'versions'
     end
 
-    allow(ServiceButler::GraphQLService).to receive(:fetch).and_return({'data' => {'version' => {'number' => 1}}})
+    allow(GraphQL::Client::HTTP).to receive(:execute).and_return({'data' => {'version' => {'number' => 1}}})
 
     expect(ExampleGraphqlService.find(1)).not_to be(nil)
     expect(ExampleGraphqlService.find(1).number).to eq(1)
@@ -60,4 +60,26 @@ RSpec.describe ServiceButler::GraphQLService do
     query = ExampleGraphqlService.send(:build_query_string, "id:1")
     expect{ GraphQL.parse(query) }.not_to raise_exception
   end
+
+  describe "Auth" do
+    before do
+      ENV['CG_MASTER_KEY'] = 'EXAMPLEKEY'
+    end
+
+    it "should set the CG auth token header" do
+      class ExampleGraphqlService < ServiceButler::GraphQLService
+        host 'http://localhost:3002/graphql'
+        action 'version'
+        batch_action 'versions'
+      end
+
+      expect(ExampleGraphqlService.adapter).to receive(:execute).with(hash_including(context: {"headers" => {'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY']}})).and_return({'data' => {'version' => {'number' => 1}}})
+      expect(ExampleGraphqlService.find(1).number).to eq(1)
+    end
+
+    after do
+      ENV['CG_MASTER_KEY'] = nil
+    end
+  end
+
 end
