@@ -149,7 +149,15 @@ module ServiceButler
       end
 
       def parse_params(arguments)
-        arguments.first.map{|k,v| "#{k}:#{v}"}.join(', ')
+        arguments.first.map do |k,v|
+          value = if v.nil?
+                    'null'
+                  else
+                    v
+                  end
+
+          "#{k}:#{value}"
+        end.join(', ')
       end
 
       def build_query_string(params, batch = false)
