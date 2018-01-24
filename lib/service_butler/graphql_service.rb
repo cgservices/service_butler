@@ -65,8 +65,8 @@ module ServiceButler
           end
 
           raise "Type #{type} not found in schema" if schema_type.nil?
-          @type = schema_type
-        elsif type.is_a?(GraphQL::NonNullType)
+          type(schema_type) || (raise "Type #{type} was not the correct format.")
+        elsif type.is_a?(GraphQL::NonNullType) || type.is_a?(GraphQL::ListType)
           @type = type.of_type
         elsif type.is_a?(GraphQL::ObjectType)
           @type = type

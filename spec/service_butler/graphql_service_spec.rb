@@ -41,13 +41,24 @@ RSpec.describe ServiceButler::GraphQLService do
     class ExampleGraphqlService < ServiceButler::GraphQLService
       host 'http://localhost:3002/graphql'
       action 'version'
-      batch_action 'versions'
     end
 
-    allow(GraphQL::Client::HTTP).to receive(:execute).and_return({'data' => {'version' => {'number' => 1}}})
+    allow(ExampleGraphqlService.adapter).to receive(:execute).and_return({'data' => {'version' => {'number' => 1}}})
 
     expect(ExampleGraphqlService.find(1)).not_to be(nil)
     expect(ExampleGraphqlService.find(1).number).to eq(1)
+  end
+
+  it "fetches a batch record" do
+    class ExampleGraphqlService < ServiceButler::GraphQLService
+      host 'http://localhost:3002/graphql'
+      batch_action 'versions'
+    end
+
+    allow(ExampleGraphqlService.adapter).to receive(:execute).and_return({'data' => {'versions' => [{'number' => 1}]}})
+
+    expect{ExampleGraphqlService.where(number: 1)}.not_to raise_exception
+    expect(ExampleGraphqlService.where(number: 1).size).to eq(1)
   end
 
   it "builds a valid query" do
