@@ -171,10 +171,20 @@ module ServiceButler
         <<-GRAPHQL
           {
             #{(batch ? batch_action : action)}(#{params}){
-              #{type.fields.reject { |_key, field| field.type.is_a?(GraphQL::ListType) }.keys.join(' ')}
+              #{fields_for_query_string.join(' ')}
             }
           }
         GRAPHQL
+      end
+
+      def fields_for_query_string
+        type.fields.reject do |_key, field|
+          if field.type.respond_to?(:of_type)
+            field.type.of_type.is_a? GraphQL::ObjectType
+          else
+            field.type.is_a? GraphQL::ObjectType
+          end
+        end.keys
       end
     end
 
