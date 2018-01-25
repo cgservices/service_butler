@@ -54,6 +54,7 @@ module ServiceButler
 
       # Type is not needed, will be called when running action.
       def type(type = nil)
+        schema # Load the schema first, as it might change the outcome of this method
         if type.is_a?(String)
           schema_type = schema.types[type]
 
@@ -85,6 +86,10 @@ module ServiceButler
         if @schema.nil? || (@schema_cached_at + 10.minutes) < Time.now
           @schema = GraphQL::Client.load_schema(adapter)
           @schema_cached_at = Time.now
+
+          # If there alread is a type set, reload them too
+          type(action) if type
+          type(batch_action) if type && action.nil?
         end
 
         @schema
