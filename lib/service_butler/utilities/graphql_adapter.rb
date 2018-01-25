@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ServiceButler
   module Utilities
     class GraphQLAdapter < ::GraphQL::Client::HTTP
