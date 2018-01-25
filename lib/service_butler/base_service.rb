@@ -24,7 +24,7 @@ module ServiceButler
       end
 
       def where(*args)
-        where!(*args) rescue nil
+        where!(*args) rescue []
       end
 
       def where!(*args)
@@ -32,7 +32,7 @@ module ServiceButler
       end
 
       def all(*args)
-        all!(*args) rescue nil
+        all!(*args) rescue []
       end
 
       def all!
