@@ -22,10 +22,12 @@ Or install it yourself as:
 
 These services are a miniature function of Activerecord. 
 The following methods are available:
-- `.find([ID])` (When `action` is defined) (also with `!`)
-- `.find_by([KEY => VALUE])` (When `action` is defined) (also with `!`)
-- `.where([KEY => VALUE])` (When `batch_action` is defined) 
-- `.all` (When `batch_action` is defined) 
+- `.find!([ID])` (When `action` is defined)
+- `.find_by!([KEY => VALUE])` (When `action` is defined)
+- `.where!([KEY => VALUE])` (When `batch_action` is defined) 
+- `.all!` (When `batch_action` is defined) 
+
+For all functions there is also a non bang (!) version that returns `nil` and fails silently
 
 It will autodetect the available fields and create methods accordingly;
 ```ruby

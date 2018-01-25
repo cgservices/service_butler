@@ -116,7 +116,7 @@ module ServiceButler
         new(result['data'][action])
       end
 
-      def where(*args)
+      def where!(*args)
         raise ArgumentError, 'no `batch_action` is set for this service' if batch_action.nil?
         raise ArgumentError, 'Unsupported argument given. Needs to be a hash' unless args.first.is_a? Hash
 
@@ -129,7 +129,7 @@ module ServiceButler
         end
       end
 
-      def all
+      def all!
         raise ArgumentError, 'no `batch_action` is set for this service' if batch_action.nil?
         result = fetch(build_query_string('', true))
 
