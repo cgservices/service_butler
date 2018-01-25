@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe ServiceButler::BaseService do
   describe '#find' do
     context 'on failure' do

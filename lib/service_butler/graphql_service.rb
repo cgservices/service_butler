@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 module ServiceButler
   class GraphQLService < BaseService
     def initialize(attributes)
       super
-
-      define_attribute_methods
-    end
+     define_attribute_methods
+   end
 
     def host
       self.class.host
@@ -59,10 +60,10 @@ module ServiceButler
           schema_type = schema.types[type]
 
           unless schema_type
-            raise StandardError, 'Query(type) not defined in schema' unless schema.types["Query"]
-            raise ArgumentError, "Field '#{type}' not found in query type" unless schema.types["Query"].fields[type]
+            raise StandardError, 'Query(type) not defined in schema' unless schema.types['Query']
+            raise ArgumentError, "Field '#{type}' not found in query type" unless schema.types['Query'].fields[type]
 
-            schema_type = schema.types["Query"].fields[type].type
+            schema_type = schema.types['Query'].fields[type].type
           end
 
           raise "Type #{type} not found in schema" if schema_type.nil?
@@ -146,15 +147,16 @@ module ServiceButler
       end
 
       private
+
       def fetch(graphql_string)
         context = {}
-        context['headers'] = {'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY']} if ENV['CG_MASTER_KEY']
+        context['headers'] = { 'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY'] } if ENV['CG_MASTER_KEY']
         document = GraphQL.parse(graphql_string)
         adapter.execute(document: document, context: context)
       end
 
       def parse_params(arguments)
-        arguments.first.map do |k,v|
+        arguments.first.map do |k, v|
           value = if v.nil?
                     'null'
                   else
@@ -169,7 +171,7 @@ module ServiceButler
         <<-GRAPHQL
           {
             #{(batch ? batch_action : action)}(#{params}){
-              #{type.fields.keys.join(" ")}
+              #{type.fields.reject { |_key, field| field.type.is_a?(GraphQL::ListType) }.keys.join(' ')}
             }
           }
         GRAPHQL
@@ -177,6 +179,7 @@ module ServiceButler
     end
 
     private
+
     def define_attribute_methods
       type.fields.keys.each do |attribute|
         define_singleton_method(attribute) { @attributes[attribute] }
