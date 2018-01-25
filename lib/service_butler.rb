@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'service_butler/configuration'
 require 'service_butler/base_service'
 
 # GraphQL Service
