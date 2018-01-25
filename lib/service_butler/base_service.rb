@@ -24,19 +24,19 @@ module ServiceButler
       end
 
       def where(*args)
-        where!(*args) rescue nil
+        where!(*args) rescue []
       end
 
-      def where(*args)
-        raise StandardError, 'where method not implemented'
+      def where!(*args)
+        raise StandardError, 'where! method not implemented'
       end
 
       def all(*args)
-        all!(*args) rescue nil
+        all!(*args) rescue []
       end
 
       def all!
-        raise StandardError, 'all method not implemented'
+        raise StandardError, 'all! method not implemented'
       end
     end
   end
