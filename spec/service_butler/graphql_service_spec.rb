@@ -104,7 +104,6 @@ RSpec.describe ServiceButler::GraphQLService do
       class ExampleGraphqlService < ServiceButler::GraphQLService
         host 'http://localhost:3002/graphql'
         action 'version'
-        batch_action 'versions'
       end
 
       service = ExampleGraphqlService.new({})
@@ -121,7 +120,6 @@ RSpec.describe ServiceButler::GraphQLService do
       class ExampleGraphqlService < ServiceButler::GraphQLService
         host 'http://localhost:3002/graphql'
         action 'version'
-        batch_action 'versions'
       end
 
       service = ExampleGraphqlService.new({})
