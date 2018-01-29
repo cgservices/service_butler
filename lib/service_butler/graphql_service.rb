@@ -4,7 +4,7 @@ module ServiceButler
   class GraphQLService < BaseService
     def initialize(attributes)
       super
-     define_attribute_methods
+      define_attribute_methods
    end
 
     def host
@@ -60,8 +60,9 @@ module ServiceButler
 
       # Type is not needed, will be called when running action.
       def type(type = nil)
-        schema # Load the schema first, as it might change the outcome of this method
         if type.is_a?(String)
+          return unless schema
+
           schema_type = schema.types[type]
 
           unless schema_type
@@ -99,6 +100,8 @@ module ServiceButler
         end
 
         @schema
+      rescue
+        raise unless ServiceButler.configuration.fail_connection_silently?
       end
 
       # Query methods
@@ -173,6 +176,9 @@ module ServiceButler
       end
 
       def build_query_string(params, batch = false)
+        type(batch ? batch_action : action) if type.nil?
+        return '' unless type
+
         <<-GRAPHQL
           {
             #{(batch ? batch_action : action)}(#{params}){
@@ -196,6 +202,8 @@ module ServiceButler
     private
 
     def define_attribute_methods
+      return if type.nil?
+
       type.fields.keys.each do |attribute|
         define_singleton_method(attribute) { @attributes[attribute] }
       end
