@@ -50,6 +50,23 @@ RSpec.describe ServiceButler::GraphQLService do
     expect(ExampleGraphqlService.find(1).number).to eq(1)
   end
 
+  it 'can reload an object from Marshal' do
+    class ExampleGraphqlService < ServiceButler::GraphQLService
+      host 'http://localhost:3002/graphql'
+      action 'version'
+    end
+
+    allow(ExampleGraphqlService.adapter).to receive(:execute).and_return('data' => {'version' => {'number' => 1}})
+
+    record = ExampleGraphqlService.find(1)
+
+    expect{ Marshal.dump(record) }.not_to raise_exception
+
+    dumped_record = Marshal.load(Marshal.dump(record))
+
+    expect(dumped_record.number).to eq(1)
+  end
+
   it 'fetches a batch record' do
     class ExampleGraphqlService < ServiceButler::GraphQLService
       host 'http://localhost:3002/graphql'
