@@ -4,7 +4,7 @@ module ServiceButler
   class GraphQLService < BaseService
     def initialize(attributes)
       super
-     define_attribute_methods
+      define_attribute_methods
    end
 
     def host
@@ -171,7 +171,7 @@ module ServiceButler
       end
 
       def build_query_string(params, batch = false)
-        type(batch ? batch_action : action) if type.blank?
+        type(batch ? batch_action : action) if type.nil?
         return '' unless type
 
         <<-GRAPHQL
@@ -197,7 +197,7 @@ module ServiceButler
     private
 
     def define_attribute_methods
-      return if type.blank?
+      return if type.nil?
 
       type.fields.keys.each do |attribute|
         define_singleton_method(attribute) { @attributes[attribute] }

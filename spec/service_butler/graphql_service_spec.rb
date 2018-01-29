@@ -98,4 +98,39 @@ RSpec.describe ServiceButler::GraphQLService do
       ENV['CG_MASTER_KEY'] = nil
     end
   end
+
+  describe '#define_attribute_methods' do
+    it 'does not define them when the type isn\'t set' do
+      class ExampleGraphqlService < ServiceButler::GraphQLService
+        host 'http://localhost:3002/graphql'
+        action 'version'
+        batch_action 'versions'
+      end
+
+      service = ExampleGraphqlService.new({})
+
+      type = nil
+      allow(service).to receive(:type) { type }
+
+      expect(type).not_to receive(:fields)
+
+      service.send(:define_attribute_methods)
+    end
+
+    it 'defines the attribute methods' do
+      class ExampleGraphqlService < ServiceButler::GraphQLService
+        host 'http://localhost:3002/graphql'
+        action 'version'
+        batch_action 'versions'
+      end
+
+      service = ExampleGraphqlService.new({})
+
+      type = OpenStruct.new(fields: {id: 1})
+      allow(service).to receive(:type) { type }
+
+      expect(service).to receive(:define_singleton_method).with(:id)
+      service.send(:define_attribute_methods)
+    end
+  end
 end
