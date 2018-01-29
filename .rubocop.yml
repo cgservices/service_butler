@@ -1,0 +1,98 @@
+# https://rubocop.readthedocs.io/
+AllCops:
+  Include:
+    - '**/Gemfile'
+    - '**/Rakefile'
+    - config.ru
+  Exclude:
+    - db/schema.rb
+
+# Longer line length
+Metrics/LineLength:
+  Max: 140
+
+# Allow bigger methods defintions
+Metrics/AbcSize:
+  Max: 18
+
+# Lines can be 120 characters long
+Metrics/LineLength:
+  Max: 120
+
+# Methods can be 20 lines long
+Metrics/MethodLength:
+  Max: 20
+
+# Prefer raise over fail
+Style/SignalException:
+  EnforcedStyle: only_raise
+
+# Make literal hashes act like arrays
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+# Disable the documentation requirement
+Style/Documentation:
+  Enabled: false
+
+# Allow the usage of begin blocks
+Style/BeginBlock:
+  Enabled: false
+
+# Force Ruby 1.9 syntax and do not mix key types
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
+# Array indentation has to be conistent, but it is more flexible
+Layout/IndentArray:
+  EnforcedStyle: consistent
+
+# Hash indentation has to be conistent, but it is more flexible
+Layout/IndentHash:
+  EnforcedStyle: consistent
+
+# Use rails indentation
+Layout/IndentationConsistency:
+  EnforcedStyle: normal
+
+# Do not trail do end blocks with extra function calls
+Style/MethodCalledOnDoEndBlock:
+  Enabled: true
+
+# Complex inline ifs need ()
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses_when_complex
+
+# Use consistent quotes when multi-lining strings
+Style/StringLiterals:
+  ConsistentQuotesInMultiline: true
+
+# Allow usage :"symbol"
+Style/SymbolLiteral:
+  Enabled: false
+
+# We usally only flatten only level so we can enable this feature
+Performance/FlatMap:
+  EnabledForFlattenWithoutParams: true
+
+# Force strict date getting to it handles better with activerecord dates
+Rails/Date:
+  EnforcedStyle: strict
+
+# Rails 5 cop
+Rails/HttpPositionalArguments:
+  Enabled: false
+
+# No need to sort gems in the bundle file
+Bundler/OrderedGems:
+  Enabled: false
+
+# Don't check on block length in spec files.
+# `describe` and `context` blocks can be large.
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+# Do not suggest to rename `has_x?` to `x?`
+Naming/PredicateName:
+  Enabled: false

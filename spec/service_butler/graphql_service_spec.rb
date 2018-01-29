@@ -44,7 +44,7 @@ RSpec.describe ServiceButler::GraphQLService do
       action 'version'
     end
 
-    allow(ExampleGraphqlService.adapter).to receive(:execute).and_return('data' => { 'version' => { 'number' => 1 } })
+    allow(ExampleGraphqlService.adapter).to receive(:execute).and_return('data' => {'version' => {'number' => 1}})
 
     expect(ExampleGraphqlService.find(1)).not_to be(nil)
     expect(ExampleGraphqlService.find(1).number).to eq(1)
@@ -56,7 +56,7 @@ RSpec.describe ServiceButler::GraphQLService do
       batch_action 'versions'
     end
 
-    allow(ExampleGraphqlService.adapter).to receive(:execute).and_return('data' => { 'versions' => [{ 'number' => 1 }] })
+    allow(ExampleGraphqlService.adapter).to receive(:execute).and_return('data' => {'versions' => [{'number' => 1}]})
 
     expect { ExampleGraphqlService.where(number: 1) }.not_to raise_exception
     expect(ExampleGraphqlService.where(number: 1).size).to eq(1)
@@ -85,7 +85,12 @@ RSpec.describe ServiceButler::GraphQLService do
         batch_action 'versions'
       end
 
-      expect(ExampleGraphqlService.adapter).to receive(:execute).with(hash_including(context: { 'headers' => { 'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY'] } })).and_return('data' => { 'version' => { 'number' => 1 } })
+      expect(ExampleGraphqlService.adapter).to receive(:execute).with(
+        hash_including(context: {'headers' =>
+          {'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY']}})
+      ).and_return(
+        'data' => {'version' => {'number' => 1}}
+      )
       expect(ExampleGraphqlService.find(1).number).to eq(1)
     end
 
