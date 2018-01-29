@@ -8,6 +8,14 @@ module ServiceButler
       @attributes = attributes
     end
 
+    def marshal_dump
+      [@attributes]
+    end
+
+    def marshal_load(array)
+      @attributes = array[0]
+    end
+
     class << self
       def find(*args)
         find!(*args)

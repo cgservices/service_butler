@@ -23,6 +23,11 @@ module ServiceButler
       self.class.schema
     end
 
+    def marshal_load(array)
+      super
+      define_attribute_methods
+    end
+
     class << self
       # The host should always be defined first.
       # Otherwise the adapter won't be able to load
