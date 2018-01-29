@@ -14,11 +14,13 @@ RSpec.describe ServiceButler::GraphQLService do
 
   Schema = GraphQL::Schema.define(query: QueryType)
 
-  before :each do
+  def mock_schema
     allow(ServiceButler::GraphQLService).to receive(:schema).and_return(GraphQL::Client.load_schema(Schema))
   end
 
   it 'initializes' do
+    mock_schema
+
     class ExampleGraphqlService < ServiceButler::GraphQLService
       host 'http://localhost:3002/graphql'
       action 'version'
@@ -29,6 +31,8 @@ RSpec.describe ServiceButler::GraphQLService do
   end
 
   it 'validates the initial settings' do
+    mock_schema
+
     expect do
       class ExampleGraphqlService < ServiceButler::GraphQLService
         host 'http://localhost:3002/graphql'
@@ -39,6 +43,8 @@ RSpec.describe ServiceButler::GraphQLService do
   end
 
   it 'fetches a single record' do
+    mock_schema
+
     class ExampleGraphqlService < ServiceButler::GraphQLService
       host 'http://localhost:3002/graphql'
       action 'version'
@@ -79,6 +85,7 @@ RSpec.describe ServiceButler::GraphQLService do
     end
 
     it 'should set the CG auth token header' do
+      mock_schema
       class ExampleGraphqlService < ServiceButler::GraphQLService
         host 'http://localhost:3002/graphql'
         action 'version'
@@ -96,6 +103,36 @@ RSpec.describe ServiceButler::GraphQLService do
 
     after do
       ENV['CG_MASTER_KEY'] = nil
+    end
+  end
+
+  describe '#schema' do
+    context 'when the config `fail_connection_silently` is false' do
+      it 'raises a connection error' do
+        ServiceButler.configure { |config| config.fail_connection_silently = false }
+
+        connection_error = Errno::ECONNREFUSED.new('Connection refused')
+        allow(GraphQL::Client).to receive(:load_schema).and_raise(connection_error)
+
+        adapter = OpenStruct.new
+        allow(ServiceButler::GraphQLService).to receive(:adapter) { adapter }
+
+        expect { ServiceButler::GraphQLService.schema }.to raise_exception(connection_error)
+      end
+    end
+
+    context 'when the config `fail_connection_silently` is true' do
+      it 'does not raise a connection error' do
+        ServiceButler.configure { |config| config.fail_connection_silently = true }
+
+        connection_error = Errno::ECONNREFUSED.new('Connection refused')
+        allow(GraphQL::Client).to receive(:load_schema).and_raise(connection_error)
+
+        adapter = OpenStruct.new
+        allow(ServiceButler::GraphQLService).to receive(:adapter) { adapter }
+
+        expect { ServiceButler::GraphQLService.schema }.not_to raise_exception
+      end
     end
   end
 
