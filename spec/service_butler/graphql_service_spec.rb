@@ -109,13 +109,7 @@ RSpec.describe ServiceButler::GraphQLService do
         batch_action 'versions'
       end
 
-      expect(ExampleGraphqlService.adapter).to receive(:execute).with(
-        hash_including(context: {'headers' =>
-          {'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY']}})
-      ).and_return(
-        'data' => {'version' => {'number' => 1}}
-      )
-      expect(ExampleGraphqlService.find(1).number).to eq(1)
+      expect(ExampleGraphqlService.adapter.headers({})).to eq({'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY']})
     end
 
     after do

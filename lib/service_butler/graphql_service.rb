@@ -157,10 +157,8 @@ module ServiceButler
       private
 
       def fetch(graphql_string)
-        context = {}
-        context['headers'] = {'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY']} if ENV['CG_MASTER_KEY']
         document = GraphQL.parse(graphql_string)
-        adapter.execute(document: document, context: context)
+        adapter.execute(document: document)
       end
 
       def parse_params(arguments)
