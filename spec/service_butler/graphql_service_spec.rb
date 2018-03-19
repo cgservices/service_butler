@@ -56,6 +56,19 @@ RSpec.describe ServiceButler::GraphQLService do
     expect(ExampleGraphqlService.find(1).number).to eq(1)
   end
 
+  it 'Converts string values' do
+    mock_schema
+
+    class ExampleGraphqlService < ServiceButler::GraphQLService
+      host 'http://localhost:3002/graphql'
+      action 'version'
+    end
+
+    allow(ExampleGraphqlService.adapter).to receive(:execute).and_return('data' => {'version' => {'number' => 'ABCD123'}})
+    expect(ExampleGraphqlService).to receive(:build_query_string).with('number:"ABCD123"')
+    ExampleGraphqlService.find_by(number: 'ABCD123')
+  end
+
   it 'can reload an object from Marshal' do
     class ExampleGraphqlService < ServiceButler::GraphQLService
       host 'http://localhost:3002/graphql'

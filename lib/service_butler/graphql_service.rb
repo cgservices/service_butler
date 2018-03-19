@@ -165,6 +165,8 @@ module ServiceButler
         arguments.first.map do |k, v|
           value = if v.nil?
                     'null'
+                  elsif v.is_a?(String)
+                    "\"#{v}\"" # Stringify
                   else
                     v
                   end
