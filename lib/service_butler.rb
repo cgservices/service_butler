@@ -2,6 +2,7 @@
 
 require 'service_butler/configuration'
 require 'service_butler/base_service'
+require 'service_butler/response'
 
 # GraphQL Service
 require 'graphql/client'

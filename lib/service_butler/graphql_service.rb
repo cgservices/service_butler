@@ -2,11 +2,6 @@
 
 module ServiceButler
   class GraphQLService < BaseService
-    def initialize(attributes)
-      super
-      define_attribute_methods
-   end
-
     def host
       self.class.host
     end
@@ -21,11 +16,6 @@ module ServiceButler
 
     def schema
       self.class.schema
-    end
-
-    def marshal_load(array)
-      super
-      define_attribute_methods
     end
 
     class << self
@@ -116,7 +106,7 @@ module ServiceButler
 
         raise StandardError, "Failed to retrieve data; #{result['errors']}" if result['errors']
 
-        new(result['data'][action])
+        Response.new(fields_for_query_string, result['data'][action])
       end
 
       def find_by!(*args)
@@ -127,7 +117,7 @@ module ServiceButler
 
         raise StandardError, "Failed to retrieve data; #{result['errors']}" if result['errors']
 
-        new(result['data'][action])
+        Response.new(fields_for_query_string, result['data'][action])
       end
 
       def where!(*args)
@@ -139,7 +129,7 @@ module ServiceButler
         raise StandardError, "Failed to retrieve data; #{result['errors']}" if result['errors']
 
         result['data'][batch_action].map do |item|
-          new(item)
+          Response.new(fields_for_query_string, item)
         end
       end
 
@@ -150,7 +140,7 @@ module ServiceButler
         raise StandardError, "Failed to retrieve data; #{result['errors']}" if result['errors']
 
         result['data'][batch_action].map do |item|
-          new(item)
+          Response.new(fields_for_query_string, item)
         end
       end
 
@@ -196,16 +186,6 @@ module ServiceButler
             field.type.is_a? GraphQL::ObjectType
           end
         end.keys
-      end
-    end
-
-    private
-
-    def define_attribute_methods
-      return if type.nil?
-
-      type.fields.keys.each do |attribute|
-        define_singleton_method(attribute) { @attributes[attribute] }
       end
     end
   end
