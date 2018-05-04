@@ -15,7 +15,7 @@ RSpec.describe ServiceButler::GraphQLService do
   Schema = GraphQL::Schema.define(query: QueryType)
 
   def mock_schema
-    allow(ServiceButler::GraphQLService).to receive(:schema).and_return(GraphQL::Client.load_schema(Schema))
+    allow(GraphQL::Client).to receive(:load_schema).with(ServiceButler::Utilities::GraphQLAdapter).and_return(GraphQL::Client.load_schema(Schema))
   end
 
   it 'initializes' do
@@ -28,18 +28,6 @@ RSpec.describe ServiceButler::GraphQLService do
     end
 
     expect(ExampleGraphqlService.type).to be(VersionType)
-  end
-
-  it 'validates the initial settings' do
-    mock_schema
-
-    expect do
-      class ExampleGraphqlService < ServiceButler::GraphQLService
-        host 'http://localhost:3002/graphql'
-        action 'not_available'
-        batch_action 'not_available'
-      end
-    end.to raise_exception(ArgumentError)
   end
 
   it 'fetches a single record' do
@@ -57,16 +45,10 @@ RSpec.describe ServiceButler::GraphQLService do
   end
 
   it 'Converts string values' do
-    mock_schema
 
-    class ExampleGraphqlService < ServiceButler::GraphQLService
-      host 'http://localhost:3002/graphql'
-      action 'version'
-    end
+    query = ServiceButler::Query.new(:id, variables: {number: 'ABCD123'})
 
-    allow(ExampleGraphqlService.adapter).to receive(:execute).and_return('data' => {'version' => {'number' => 'ABCD123'}})
-    expect(ExampleGraphqlService).to receive(:build_query_string).with('number:"ABCD123"')
-    ExampleGraphqlService.find_by(number: 'ABCD123')
+    expect(ServiceButler::BaseService.new.build_request_params(query.variables)).to eq("number: \"ABCD123\"")
   end
 
   it 'can reload an object from Marshal' do
@@ -98,18 +80,6 @@ RSpec.describe ServiceButler::GraphQLService do
 
     expect { ExampleGraphqlService.where(number: 1) }.not_to raise_exception
     expect(ExampleGraphqlService.where(number: 1).size).to eq(1)
-  end
-
-  it 'builds a valid query' do
-    mock_schema
-    class ExampleGraphqlService < ServiceButler::GraphQLService
-      host 'http://localhost:3002/graphql'
-      action 'version'
-      batch_action 'versions'
-    end
-
-    query = ExampleGraphqlService.send(:build_query_string, 'id:1')
-    expect { GraphQL.parse(query) }.not_to raise_exception
   end
 
   describe 'Auth' do
@@ -144,7 +114,7 @@ RSpec.describe ServiceButler::GraphQLService do
         adapter = OpenStruct.new
         allow(ServiceButler::GraphQLService).to receive(:adapter) { adapter }
 
-        expect { ServiceButler::GraphQLService.schema }.to raise_exception(connection_error)
+        expect { ServiceButler::GraphQLService.fetch_type_from_schema('version') }.to raise_exception(connection_error)
       end
     end
 
@@ -158,7 +128,7 @@ RSpec.describe ServiceButler::GraphQLService do
         adapter = OpenStruct.new
         allow(ServiceButler::GraphQLService).to receive(:adapter) { adapter }
 
-        expect { ServiceButler::GraphQLService.schema }.not_to raise_exception
+        expect { ServiceButler::GraphQLService.fetch_type_from_schema('version') }.not_to raise_exception
       end
     end
   end
