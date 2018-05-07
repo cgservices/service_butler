@@ -34,7 +34,7 @@ module ServiceButler
     end
 
     def root_selection
-      @selection.select{|v| v.is_a?(String) || v.is_a?(Symbol) }.map(&:to_s)
+      @selection.flat_map { |v| v.is_a?(Hash) ? v.keys.map(&:to_s) : v.to_s }
     end
   end
 end
