@@ -131,6 +131,21 @@ RSpec.describe ServiceButler::BaseService do
 
       allow(ExampleGraphqlService.adapter).to receive(:execute).and_return('data' => {'version' => {'number' => 1}})
 
+      request = ExampleGraphqlService.new
+      request.select('number', relation: ['id'], core_relation: ['id', sub_relation: ['id']])
+      request.query.variables = {
+          id: 1,
+          value: 2,
+          relation: {
+              id: 4,
+              offest: 5
+          },
+          core_relation: {
+              __param: 1,
+              sub_relation: {key: 'test'}
+          }
+      }
+
       expect(ExampleGraphqlService.find(1)).not_to be(nil)
       expect(ExampleGraphqlService.find(1).number).to eq(1)
     end
@@ -179,6 +194,36 @@ RSpec.describe ServiceButler::BaseService do
   end
 
   describe 'QueryBuilder' do
+    describe '#build_query_string' do
+      it 'Builds sub parameters' do
+        class ExampleGraphqlService < ServiceButler::BaseService
+          host 'http://localhost:3002/graphql'
+          action 'version'
+        end
+
+        request = ExampleGraphqlService.new
+        request.select('number', relation: ['id'], core_relation: ['id', sub_relation: ['id']])
+        request.query.scope = ServiceButler::Query::SCOPE_SINGLE
+        request.query.variables = {
+            id: 1,
+            value: 2,
+            relation: {
+                id: 4,
+                offest: 5
+            },
+            core_relation: {
+                __param: 1,
+                sub_relation: {key: 'test'}
+            }
+        }
+
+        query_string = request.build_query_string
+        test_string = "          {\n            version(id: 1, value: 2, core_relation: 1){\n              number, relation(id: 4, offest: 5) { id }, core_relation() { id, sub_relation(key: \"test\") { id } }\n            }\n          }\n"
+
+        expect(query_string).to eq(test_string)
+      end
+    end
+
     describe '#build_request_params' do
       it 'Converts string values' do
         query = ServiceButler::Query.new(:id, variables: {number: 'ABCD123'})

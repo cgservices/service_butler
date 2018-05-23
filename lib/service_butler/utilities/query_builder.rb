@@ -6,6 +6,7 @@ module ServiceButler
       end
 
       def default_query_fields
+        return [] unless type
         type.fields.reject do |_key, field|
           if field.type.respond_to?(:of_type)
             field.type.of_type.is_a? GraphQL::ObjectType
@@ -16,30 +17,38 @@ module ServiceButler
       end
 
       def build_query_string
-        self.class.type(build_request_action(query.scope)) if type.nil?
-        return '' unless type
+        self.class.type if type.nil?
 
         <<-GRAPHQL
           {
             #{build_request_action(query.scope)}(#{build_request_params(query.variables)}){
-              #{build_request_fields(query.selection)}
+              #{build_request_fields(query.selection, query.variables)}
             }
           }
         GRAPHQL
       end
 
       def build_request_action(scope)
-        scope == Query::SCOPE_SET ? self.class.batch_action : self.class.action
+        request_action = scope == Query::SCOPE_SET ? self.class.batch_action : self.class.action
+
+        raise "No action is set for scope '#{scope}'" unless request_action
+
+        request_action
       end
 
       def build_request_params(params)
         return if (params.respond_to?(:empty?) ? !!params.empty? : !params)
 
-        param_strings = params.map do |key, value|
-          "#{key}: #{build_request_argument(value)}"
+        param_strings = params.except(:__param).map do |key, value|
+          case value
+            when Hash
+              value[:__param] ? "#{key}: #{build_request_argument(value[:__param])}" : ''
+            else
+              "#{key}: #{build_request_argument(value)}"
+          end
         end
 
-        param_strings.join(', ')
+        param_strings.reject(&:empty?).join(', ')
       end
 
       def build_request_argument(argument)
@@ -55,13 +64,16 @@ module ServiceButler
         end
       end
 
-      def build_request_fields(fieldset)
+      def build_request_fields(fieldset, params = {})
         return "#{fieldset}" unless fieldset.respond_to?(:map)
 
         field_strings = fieldset.map do |field|
           case field
             when Hash
-              field.map { |k, v| "#{k} { #{build_request_fields(v)} }" }
+              field.map do |k, v|
+                sub_params = params[k] || {}
+                "#{k}(#{build_request_params(sub_params)}) { #{build_request_fields(v, sub_params)} }"
+              end
             else
               "#{field}"
           end
