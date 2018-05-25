@@ -71,7 +71,7 @@ module ServiceButler
           case field
             when Hash
               field.map do |k, v|
-                sub_params = params[k] || {}
+                sub_params = params[k.to_sym] || params[k.to_s] || {}
                 "#{k}(#{build_request_params(sub_params)}) { #{build_request_fields(v, sub_params)} }"
               end
             else

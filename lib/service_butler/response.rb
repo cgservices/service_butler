@@ -24,7 +24,17 @@ module ServiceButler
       fields = fields.keys if fields.is_a?(Hash)
 
       fields.each do |field|
-        define_singleton_method(field) { @attributes[field] }
+        define_singleton_method(field) do
+          if @attributes[field].is_a?(Array)
+            collection = @attributes[field].map do |attribute|
+              attribute ? Response.new(attribute.keys, attribute) : nil
+            end
+
+            collection.reject(&:nil?)
+          else
+            @attributes[field]
+          end
+        end
       end
     end
   end
