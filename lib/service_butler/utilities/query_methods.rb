@@ -74,7 +74,7 @@ module ServiceButler
 
         def fetch
           document = GraphQL.parse(build_query_string)
-          response = adapter.execute(document: document)
+          response = adapter.execute(document: document, context: {'headers' => query.headers})
 
           raise StandardError, "Failed to retrieve data; #{response['errors']}" if response['errors']
 

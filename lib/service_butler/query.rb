@@ -3,10 +3,11 @@ module ServiceButler
     SCOPE_SINGLE = :single.freeze
     SCOPE_SET = :set.freeze
 
-    def initialize(*selection, variables: {}, scope: SCOPE_SINGLE)
+    def initialize(*selection, variables: {}, scope: SCOPE_SINGLE, headers: {})
       @scope = scope
       @selection = selection
       @variables = variables
+      @headers = headers
     end
 
     def scope=(value)
@@ -23,6 +24,14 @@ module ServiceButler
 
     def variables
       @variables
+    end
+
+    def headers=(value)
+      @headers = value
+    end
+
+    def headers
+      @headers
     end
 
     def selection=(value)
