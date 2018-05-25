@@ -131,21 +131,6 @@ RSpec.describe ServiceButler::BaseService do
 
       allow(ExampleGraphqlService.adapter).to receive(:execute).and_return('data' => {'version' => {'number' => 1}})
 
-      request = ExampleGraphqlService.new
-      request.select('number', relation: ['id'], core_relation: ['id', sub_relation: ['id']])
-      request.query.variables = {
-          id: 1,
-          value: 2,
-          relation: {
-              id: 4,
-              offest: 5
-          },
-          core_relation: {
-              __param: 1,
-              sub_relation: {key: 'test'}
-          }
-      }
-
       expect(ExampleGraphqlService.find(1)).not_to be(nil)
       expect(ExampleGraphqlService.find(1).number).to eq(1)
     end
