@@ -27,7 +27,11 @@ module ServiceButler
         define_singleton_method(field) do
           if @attributes[field].is_a?(Array)
             collection = @attributes[field].map do |attribute|
-              attribute ? Response.new(attribute.keys, attribute) : nil
+              if attribute.is_a?(String)
+                attribute
+              else
+                attribute.try(:keys) ? Response.new(attribute.keys, attribute) : nil
+              end
             end
 
             collection.reject(&:nil?)
