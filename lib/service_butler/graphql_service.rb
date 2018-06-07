@@ -2,8 +2,5 @@
 
 module ServiceButler
   class GraphQLService < BaseService
-
-
-
   end
 end
