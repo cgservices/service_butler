@@ -26,6 +26,10 @@ module ServiceButler
         def batch_action
           self.class.batch_action
         end
+
+        def query_type
+          self.class.query_type
+        end
       end
 
       module ClassMethods
@@ -70,6 +74,14 @@ module ServiceButler
             @batch_action = batch_action
           else
             @batch_action
+          end
+        end
+
+        def query_type(query_type = nil)
+          if query_type
+            @query_type = query_type
+          else
+            @query_type
           end
         end
 
