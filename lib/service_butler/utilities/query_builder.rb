@@ -63,6 +63,8 @@ module ServiceButler
             "[#{argument.map{ |v| build_request_argument(v) }.join(', ')}]"
           when NilClass
             'null'
+          when Hash
+            "{#{build_request_params(argument)}}"
           else
             "\"#{argument}\""
         end
