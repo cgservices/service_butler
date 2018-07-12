@@ -20,12 +20,16 @@ module ServiceButler
         self.class.type if type.nil?
 
         <<-GRAPHQL
-          {
+          #{build_query_type} {
             #{build_request_action(query.scope)}(#{build_request_params(query.variables)}){
               #{build_request_fields(query.selection, query.variables)}
             }
           }
         GRAPHQL
+      end
+
+      def build_query_type
+        self.class.query_type || 'query'
       end
 
       def build_request_action(scope)
@@ -59,6 +63,8 @@ module ServiceButler
             "[#{argument.map{ |v| build_request_argument(v) }.join(', ')}]"
           when NilClass
             'null'
+          when Hash
+            "{#{build_request_params(argument)}}"
           else
             "\"#{argument}\""
         end

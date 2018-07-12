@@ -5,8 +5,5 @@ module ServiceButler
     include Utilities::ServiceConfiguration
     include Utilities::QueryBuilder
     include Utilities::QueryMethods
-
-
-
   end
 end

@@ -203,7 +203,7 @@ RSpec.describe ServiceButler::BaseService do
         }
 
         query_string = request.build_query_string
-        test_string = "          {\n            version(id: 1, value: 2, core_relation: 1){\n              number, relation(id: 4, offest: 5) { id }, core_relation() { id, sub_relation(key: \"test\") { id } }\n            }\n          }\n"
+        test_string = "          query {\n            version(id: 1, value: 2, core_relation: 1){\n              number, relation(id: 4, offest: 5) { id }, core_relation() { id, sub_relation(key: \"test\") { id } }\n            }\n          }\n"
 
         expect(query_string).to eq(test_string)
       end
@@ -214,6 +214,27 @@ RSpec.describe ServiceButler::BaseService do
         query = ServiceButler::Query.new(:id, variables: {number: 'ABCD123'})
 
         expect(ServiceButler::BaseService.new.build_request_params(query.variables)).to eq("number: \"ABCD123\"")
+      end
+    end
+
+    describe '#build_query_type' do
+      it 'Defaults to "query" query_type' do
+        request = ExampleGraphqlService.new
+        query_string = request.build_query_string
+        test_string = "          query {\n            version(){\n              number\n            }\n          }\n"
+        expect(query_string).to eq(test_string)
+      end
+      it 'Sets "mutation" query_type' do
+        class ExampleMutationGraphqlService < ServiceButler::BaseService
+          host 'http://localhost:3002/graphql'
+          action 'version'
+          batch_action 'versions'
+          query_type :mutation
+        end
+        request = ExampleMutationGraphqlService.new
+        query_string = request.build_query_string
+        test_string = "          mutation {\n            version(){\n              \n            }\n          }\n"
+        expect(query_string).to eq(test_string)
       end
     end
   end
