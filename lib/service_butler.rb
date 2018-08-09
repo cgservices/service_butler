@@ -3,6 +3,7 @@
 # GraphQL
 require 'graphql/client'
 require 'graphql/client/http'
+require 'graphql/internal_representation/node_decorator'
 
 # Gem
 require 'service_butler/configuration'
