@@ -47,6 +47,17 @@ end
 
 Both `action` and `batch_action` are optional. But at lease one of them is required
 
+# X-CG-AUTH-Token
+
+If your application needs to send the `X-CG-AUTH-Token` in the header of the requests, you should configure this in your application:
+
+`config/initializers/service_butler.rb`
+```ruby
+ServiceButler.configure do |config|
+  config.x_cg_auth_token = ENV["X_CG_AUTH_TOKEN"]
+end
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
