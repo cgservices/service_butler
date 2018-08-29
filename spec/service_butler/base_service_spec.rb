@@ -51,7 +51,7 @@ RSpec.describe ServiceButler::BaseService do
 
   describe 'Auth' do
     before do
-      ENV['CG_MASTER_KEY'] = 'EXAMPLEKEY'
+      ServiceButler.configure { |config| config.x_cg_auth_token = 'my-auth-token' }
     end
 
     it 'should set the CG auth token header' do
@@ -62,11 +62,7 @@ RSpec.describe ServiceButler::BaseService do
         batch_action 'versions'
       end
 
-      expect(ExampleGraphqlService.adapter.headers({})).to eq({'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY']})
-    end
-
-    after do
-      ENV['CG_MASTER_KEY'] = nil
+      expect(ExampleGraphqlService.adapter.headers({})).to eq({'X-CG-AUTH-Token' => 'my-auth-token'})
     end
   end
 

@@ -5,7 +5,10 @@ module ServiceButler
     class GraphQLAdapter < ::GraphQL::Client::HTTP
       def headers(context)
         headers = {}
-        headers.merge!({'X-CG-AUTH-Token' => ENV['CG_MASTER_KEY']}) if ENV['CG_MASTER_KEY']
+
+        x_cg_auth_token = ServiceButler.configuration.x_cg_auth_token
+        headers.merge!({ 'X-CG-AUTH-Token' => x_cg_auth_token }) if x_cg_auth_token
+
         headers.merge!(context['headers']) if context['headers']
         headers
       end
