@@ -57,16 +57,20 @@ module ServiceButler
 
       def build_request_argument(argument)
         case argument
-          when Numeric
-            argument.to_s
-          when Array
-            "[#{argument.map{ |v| build_request_argument(v) }.join(', ')}]"
-          when NilClass
-            'null'
-          when Hash
-            "{#{build_request_params(argument)}}"
-          else
-            "\"#{argument}\""
+        when Numeric
+          argument.to_s
+        when Array
+          "[#{argument.map{ |v| build_request_argument(v) }.join(', ')}]"
+        when NilClass
+          'null'
+        when Hash
+          "{#{build_request_params(argument)}}"
+        when FalseClass
+          argument
+        when TrueClass
+          argument
+        else
+          "\"#{argument}\""
         end
       end
 
