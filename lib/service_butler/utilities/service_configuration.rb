@@ -2,34 +2,7 @@ module ServiceButler
   module Utilities
     module ServiceConfiguration
       def self.included base
-        base.send :include, InstanceMethods
         base.extend ClassMethods
-      end
-
-      module InstanceMethods
-        def host
-          self.class.host
-        end
-
-        def type
-          self.class.type
-        end
-
-        def adapter
-          self.class.adapter
-        end
-
-        def action
-          self.class.action
-        end
-
-        def batch_action
-          self.class.batch_action
-        end
-
-        def query_type
-          self.class.query_type
-        end
       end
 
       module ClassMethods
@@ -58,7 +31,7 @@ module ServiceButler
         end
 
         def adapter
-          @adapter ||= Utilities::GraphQLAdapter.new(@host)
+          @adapter ||= Utilities::GraphQLAdapter.new(@host.to_s)
         end
 
         def action(action = nil)

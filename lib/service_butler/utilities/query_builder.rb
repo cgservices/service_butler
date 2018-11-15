@@ -1,13 +1,19 @@
 module ServiceButler
   module Utilities
-    module QueryBuilder
+    class QueryBuilder
+      attr_accessor :configuration
+
+      def initialize(configuration)
+        @configuration = configuration
+      end
+
       def query
         @query ||= Query.new(*default_query_fields)
       end
 
       def default_query_fields
-        return [] unless type
-        type.fields.reject do |_key, field|
+        return [] unless configuration[:type]
+        configuration[:type].fields.reject do |_key, field|
           if field.type.respond_to?(:of_type)
             field.type.of_type.is_a? GraphQL::ObjectType
           else
@@ -17,7 +23,7 @@ module ServiceButler
       end
 
       def build_query_string
-        self.class.type if type.nil?
+        return if configuration[:type].nil?
 
         <<-GRAPHQL
           #{build_query_type} {
@@ -29,11 +35,11 @@ module ServiceButler
       end
 
       def build_query_type
-        self.class.query_type || 'query'
+        configuration[:query_type] || 'query'
       end
 
       def build_request_action(scope)
-        request_action = scope == Query::SCOPE_SET ? self.class.batch_action : self.class.action
+        request_action = scope == Query::SCOPE_SET ? configuration[:batch_action] : configuration[:action]
 
         raise "No action is set for scope '#{scope}'" unless request_action
 
