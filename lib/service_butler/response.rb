@@ -19,6 +19,10 @@ module ServiceButler
       define_attribute_methods
     end
 
+    def empty?
+      @attributes.nil? || @attributes.empty?
+    end
+
     def define_attribute_methods
       fields = @fields
       fields = fields.keys if fields.is_a?(Hash)
