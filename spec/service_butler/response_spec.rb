@@ -17,4 +17,27 @@ RSpec.describe ServiceButler::Response do
       response.send(:define_attribute_methods)
     end
   end
+
+  describe '#empty?' do
+    context 'when there are no attributes' do
+      it 'returns true' do
+        response = ServiceButler::Response.new([], {})
+        expect(response).to be_empty
+      end
+    end
+
+    context 'when response attributes is nil' do
+      it 'returns true' do
+        response = ServiceButler::Response.new([], nil)
+        expect(response).to be_empty
+      end
+    end
+
+    context 'when there are attributes available' do
+      it 'returns false' do
+        response = ServiceButler::Response.new([], { 'attr' => true })
+        expect(response).not_to be_empty
+      end
+    end
+  end
 end
